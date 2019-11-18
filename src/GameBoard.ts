@@ -45,17 +45,30 @@ interface BoundingBox {
 }
 
 class GameBoard {
-
-    /** Tiles are located in the grid with indices as [x][y] */
+    /** An array indicating the tile at each position on the board. Tiles are
+     *  located in the grid with indices as [x][y]. The number 0 holds the
+     *  location of the empty space on the board.
+     */
     private readonly tiles: number[][];
 
+    /** The offset of the upper-left corner of the first tile from the
+     *  upper-left corner of the canvas element
+     */
     private _offset: CoordinatePair = {x: 250, y: 100};
+    /** The number of tiles along one axis of the board */
     private _gridSize: CoordinatePair = {x: 4, y: 4};
+    /** The length of one side of a square tile, in pixels */
     private _tileSize: number = 100;
+    /** The width of the board's border, in pixels */
     private _border: number = 4;
+    /** The width of the board's margin, in pixels. Everything within this
+     *  margin is cleared when the board is drawn
+     */
     private _margin: number = 2;
 
+    /** The canvas drawing context */
     private _ctx: CanvasRenderingContext2D | null = null;
+    /** Font size of number characters on the board, in pixels */
     private _fontSize: number;
 
     constructor() {
@@ -156,6 +169,7 @@ class GameBoard {
         );
     }
 
+    /** Draw the current state to the canvas */
     draw() {
 
         //  Get local drawing context reference and verify it has been assigned

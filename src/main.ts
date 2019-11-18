@@ -1,19 +1,19 @@
 function main(): void {
 
-    //  Assign the canvas to `board`
-    let cnvs = <HTMLCanvasElement>document.getElementById('viewport');
+    /** The canvas element */
+    let canvas = <HTMLCanvasElement>document.getElementById('viewport');
 
     //  Make sure the canvas element's size agrees with its CSS-styled size
-    cnvs.width = window.innerWidth;
-    cnvs.height = window.innerHeight;
-    cnvs.style.width = `${window.innerWidth}px`;
-    cnvs.style.height = `${window.innerHeight}px`;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.width = `${window.innerWidth}px`;
+    canvas.style.height = `${window.innerHeight}px`;
 
     //  Define the click event handler
     // board.addEventListener('click', shiftTiles);
 
     //  Verify the canvas rendering context is accessible
-    let ctx: CanvasRenderingContext2D|null = cnvs.getContext('2d');
+    let ctx: CanvasRenderingContext2D|null = canvas.getContext('2d');
     if(ctx === null) {
         throw new Error(`Error accessing canvas rendering context`);
     }
@@ -21,118 +21,12 @@ function main(): void {
     //  Create a GameBoard instance and assign its ctx property
     let board: GameBoard = new GameBoard();
     board.ctx = ctx;
+
+    //  Shuffle the board and draw its initial state
+    //board.shuffle()
     board.draw();
-
-    //  Populate the `tiles` array and shuffle the board
-    /*for(let i = 0; i < BOARD.size; ++i) {
-        for(let j = 0; j < BOARD.size; ++j) {
-            tiles[i*4 + j] = [j, i];
-        }
-    }
-    shuffleTiles();
-
-    //  Draw the game board in its initial state
-    draw();*/
 }
 document.addEventListener('DOMContentLoaded', main);
-
-/** The canvas element */
-// let board: HTMLCanvasElement;
-
-/** A persistent drawing context */
-// let ctx: CanvasRenderingContext2D;
-
-/** An array indicating the positions (coordinates) of each tile on the board.
- *
- * The final element (index `tiles.length - 1`) is the empty space on the board.
- *
- * Each tile is numbered by its index in the array plus one, e.g. the element
- * at index 1 (the second element) gives the coordinates of the tile numbered
- * 1 + 1 = 2.
- */
-// let tiles: Array<CoordinatePair> = [];
-
-/** The board's display is based on HTML's box model - it has its content, a
- *  border, and a margin.
- *
- *  @property size - The number of tiles along one axis of the board
- *  @property pos - The offset of the upper-left corner of the first tile from
- *            the upper-left corner of the canvas element
- *  @property boarder - the width of the board's border, in pixels
- *  @property margin - the width of the board's margin, in pixels
- *  @property tile - the length of one side of one tile, in pixels
- */
-/*const BOARD: {size: number, pos: CoordinatePair, border: number, margin: number, tile: number} = {
-    size: 4,
-    pos: [250, 100],
-    border: 4,
-    margin: 2,
-    tile: 100
-};*/
-
-/** Font size of number characters on the board, in pixels */
-// let fontSize: number = BOARD.tile * 0.6;
-
-/** Draw the current state to the canvas */
-/*function draw(): void {
-
-    //  Clear the board area
-    let start: CoordinatePair = [
-        BOARD.pos[0] - BOARD.border - BOARD.margin / 2,
-        BOARD.pos[1] - BOARD.border - BOARD.margin / 2
-    ];
-    let size: number = BOARD.size * BOARD.tile + 2 * BOARD.border + 2 * BOARD.margin;
-    ctx.clearRect(start[0], start[1], size, size);
-
-    //  Reassign `start` and `size` to draw the border (exclude the margin)
-    start = [
-        BOARD.pos[0] - BOARD.border,
-        BOARD.pos[1] - BOARD.border
-    ];
-    size -= 2 * BOARD.margin;
-
-    //  Draw a rectangle for the entire board
-    ctx.beginPath();
-    ctx.moveTo(...BOARD.pos);
-
-    ctx.lineWidth = BOARD.border;
-    ctx.strokeStyle = 'black';
-    ctx.strokeRect(start[0], start[1], size, size);
-
-    //  Exclude the final element in tiles from this loop to so as to
-    //  leave the "empty" tile blank
-    for(let i = 0; i < tiles.length - 1; ++i) {
-
-        let tile = tiles[i];
-
-        //  Calculate the position of the tile wrt the board, in pixels
-        let pos: CoordinatePair = [
-            BOARD.pos[0] + tile[0] * BOARD.tile,
-            BOARD.pos[1] + tile[1] * BOARD.tile
-        ];
-
-        // Fill the tile and draw its outline
-        ctx.beginPath();
-        ctx.fillStyle = '#888888';
-        ctx.fillRect(pos[0], pos[1], BOARD.tile, BOARD.tile);
-        ctx.lineWidth = 2;
-        ctx.strokeRect(pos[0], pos[1], BOARD.tile, BOARD.tile);
-
-        //  Number the tile
-        //  With alignment 'centered' and a 'middle' baseline, fillText() and
-        //  strokeText() position text by the center of its bounding/em box
-        //  so the only offset that's necessary is half the tile's width/height
-        let char: string = (i + 1).toString();
-        ctx.beginPath();
-        ctx.font = `${fontSize}px sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#444444';
-        ctx.fillText(char, pos[0] + (BOARD.tile / 2), pos[1] + (BOARD.tile / 2));
-        ctx.lineWidth = 1;
-        ctx.strokeText(char,  pos[0] + (BOARD.tile / 2), pos[1] + (BOARD.tile / 2));
-    }
-}*/
 
 /*function shiftTiles(ev: MouseEvent): void {
 

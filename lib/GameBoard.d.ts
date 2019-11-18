@@ -16,14 +16,28 @@ interface BoundingBox {
     y: BoundedValue;
 }
 declare class GameBoard {
-    /** Tiles are located in the grid with indices as [x][y] */
+    /** An array indicating the tile at each position on the board. Tiles are
+     *  located in the grid with indices as [x][y]. The number 0 holds the
+     *  location of the empty space on the board.
+     */
     private readonly tiles;
+    /** The offset of the upper-left corner of the first tile from the
+     *  upper-left corner of the canvas element
+     */
     private _offset;
+    /** The number of tiles along one axis of the board */
     private _gridSize;
+    /** The length of one side of a square tile, in pixels */
     private _tileSize;
+    /** The width of the board's border, in pixels */
     private _border;
+    /** The width of the board's margin, in pixels. Everything within this
+     *  margin is cleared when the board is drawn
+     */
     private _margin;
+    /** The canvas drawing context */
     private _ctx;
+    /** Font size of number characters on the board, in pixels */
     private _fontSize;
     constructor();
     get margin(): number;
@@ -43,5 +57,6 @@ declare class GameBoard {
     set fontSize(value: number);
     getBoundingBox(): BoundingBox;
     hit(point: CoordinatePair): boolean;
+    /** Draw the current state to the canvas */
     draw(): void;
 }
