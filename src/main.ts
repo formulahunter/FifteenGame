@@ -1,48 +1,46 @@
-type CoordinatePair = [number, number]; //  Also used as an offset/displacement
-                                        //  vector in a more abstract sense
-
 function main(): void {
 
     //  Assign the canvas to `board`
-    board = <HTMLCanvasElement>document.getElementById('viewport');
+    let cnvs = <HTMLCanvasElement>document.getElementById('viewport');
 
     //  Make sure the canvas element's size agrees with its CSS-styled size
-    board.width = window.innerWidth;
-    board.height = window.innerHeight;
-    board.style.width = `${window.innerWidth}px`;
-    board.style.height = `${window.innerHeight}px`;
+    cnvs.width = window.innerWidth;
+    cnvs.height = window.innerHeight;
+    cnvs.style.width = `${window.innerWidth}px`;
+    cnvs.style.height = `${window.innerHeight}px`;
 
     //  Define the click event handler
-    board.addEventListener('click', shiftTiles);
+    // board.addEventListener('click', shiftTiles);
 
     //  Verify the canvas rendering context is accessible
-    let ctxCheck = board.getContext('2d');
-    if(ctxCheck === null) {
+    let ctx: CanvasRenderingContext2D|null = cnvs.getContext('2d');
+    if(ctx === null) {
         throw new Error(`Error accessing canvas rendering context`);
     }
-    ctx = ctxCheck;
+
+    //  Create a GameBoard instance and assign its ctx property
+    let board: GameBoard = new GameBoard();
+    board.ctx = ctx;
+    board.draw();
 
     //  Populate the `tiles` array and shuffle the board
-    for(let i = 0; i < SIZE; ++i) {
-        for(let j = 0; j < SIZE; ++j) {
+    /*for(let i = 0; i < BOARD.size; ++i) {
+        for(let j = 0; j < BOARD.size; ++j) {
             tiles[i*4 + j] = [j, i];
         }
     }
     shuffleTiles();
 
     //  Draw the game board in its initial state
-    draw();
+    draw();*/
 }
 document.addEventListener('DOMContentLoaded', main);
 
 /** The canvas element */
-let board: HTMLCanvasElement;
+// let board: HTMLCanvasElement;
 
 /** A persistent drawing context */
-let ctx: CanvasRenderingContext2D;
-
-/** The size of one side of the game board */
-const SIZE: number = 4;
+// let ctx: CanvasRenderingContext2D;
 
 /** An array indicating the positions (coordinates) of each tile on the board.
  *
@@ -52,11 +50,7 @@ const SIZE: number = 4;
  * at index 1 (the second element) gives the coordinates of the tile numbered
  * 1 + 1 = 2.
  */
-let tiles: Array<CoordinatePair> = [];
-
-/** The size of each tile on the board, in pixels */
-const UNIT: number = 100;
-
+// let tiles: Array<CoordinatePair> = [];
 
 /** The board's display is based on HTML's box model - it has its content, a
  *  border, and a margin.
@@ -68,19 +62,19 @@ const UNIT: number = 100;
  *  @property margin - the width of the board's margin, in pixels
  *  @property tile - the length of one side of one tile, in pixels
  */
-const BOARD: {size: number, pos: CoordinatePair, border: number, margin: number, tile: number} = {
+/*const BOARD: {size: number, pos: CoordinatePair, border: number, margin: number, tile: number} = {
     size: 4,
     pos: [250, 100],
     border: 4,
     margin: 2,
     tile: 100
-};
+};*/
 
 /** Font size of number characters on the board, in pixels */
-let fontSize: number = BOARD.tile * 0.6;
+// let fontSize: number = BOARD.tile * 0.6;
 
 /** Draw the current state to the canvas */
-function draw(): void {
+/*function draw(): void {
 
     //  Clear the board area
     let start: CoordinatePair = [
@@ -138,9 +132,9 @@ function draw(): void {
         ctx.lineWidth = 1;
         ctx.strokeText(char,  pos[0] + (BOARD.tile / 2), pos[1] + (BOARD.tile / 2));
     }
-}
+}*/
 
-function shiftTiles(ev: MouseEvent): void {
+/*function shiftTiles(ev: MouseEvent): void {
 
     //  Check the click coordinates wrt the board to verify that the click is
     //  on a tile
@@ -251,16 +245,16 @@ function shiftTiles(ev: MouseEvent): void {
     tiles[tiles.length - 1] = [col, row];
 
     draw();
-}
+}*/
 
-function shuffleTiles(): void {
+/*function shuffleTiles(): void {
     let temp: CoordinatePair[] = [];
     for(let i = tiles.length - 1; i >= 0; --i) {
         let ind = Math.trunc(Math.random() * tiles.length - 1);
         temp.push(tiles.splice(ind, 1)[0]);
     }
     tiles = temp;
-}
+}*/
 
 // const DIRECTION = ['up', 'right', 'down', 'left'];
 // function animateTile(tile, dir) {
