@@ -2,13 +2,18 @@ interface CoordinatePair {
     x: number;
     y: number;
 }
-interface ValueBounds {
-    min: number;
-    max: number;
+declare class BoundedValue {
+    readonly min: number;
+    readonly max: number;
+    private _val?;
+    constructor(min: number, max: number, value?: number);
+    get val(): number | undefined;
+    set val(val: number | undefined);
+    valueOf(): number | undefined;
 }
 interface BoundingBox {
-    x: ValueBounds;
-    y: ValueBounds;
+    x: BoundedValue;
+    y: BoundedValue;
 }
 declare class GameBoard {
     private readonly tiles;

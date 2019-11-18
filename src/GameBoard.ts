@@ -3,14 +3,45 @@ interface CoordinatePair {
     y: number
 }
 
-interface ValueBounds {
-    min: number,
-    max: number
+class BoundedValue {
+
+    readonly min: number;
+    readonly max: number;
+    private _val?: number;
+
+    constructor(min: number, max: number, value?: number) {
+        this.min = min;
+        this.max = max;
+        this.val = value;
+    }
+
+    get val(): number|undefined {
+        return this._val;
+    }
+    set val(val: number|undefined) {
+        if(val !== undefined) {
+            if(val < this.min) {
+                let er = new Error(`${val} is below the minimum bound of ${this.min}`);
+                er.name = 'BoundedValueBelowMinimum';
+                throw er;
+            }
+            if(val > this.max) {
+                let er = new Error(`${val} is above the maximum bound of ${this.max}`);
+                er.name = 'BoundedValueAboveMaximum';
+                throw er;
+            }
+        }
+
+        this._val = val;
+    }
+    valueOf(): number|undefined {
+        return this.val;
+    }
 }
 
 interface BoundingBox {
-    x: ValueBounds,
-    y: ValueBounds
+    x: BoundedValue,
+    y: BoundedValue
 }
 
 class GameBoard {
@@ -86,14 +117,8 @@ class GameBoard {
     getBoundingBox(): BoundingBox {
 
         return {
-            x: {
-                min: this.offset.x,
-                max: this.offset.x + this.gridSize.x * this.tileSize
-            },
-            y: {
-                min: this.offset.y,
-                max: this.offset.y + this.gridSize.y * this.tileSize
-            }
+            x: new BoundedValue(this.offset.x, this.offset.x + this.gridSize.x * this.tileSize),
+            y: new BoundedValue(this.offset.y, this.offset.y + this.gridSize.y * this.tileSize)
         };
     }
     hit(point: CoordinatePair): boolean {
