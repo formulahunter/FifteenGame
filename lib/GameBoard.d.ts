@@ -16,6 +16,7 @@ interface BoundingBox {
     y: BoundedValue;
 }
 declare class GameBoard {
+    /** Tiles are located in the grid with indices as [x][y] */
     private readonly tiles;
     private _offset;
     private _gridSize;
@@ -23,6 +24,7 @@ declare class GameBoard {
     private _border;
     private _margin;
     private _ctx;
+    private _fontSize;
     constructor();
     get margin(): number;
     set margin(value: number);
@@ -36,6 +38,9 @@ declare class GameBoard {
     set offset(value: CoordinatePair);
     get ctx(): CanvasRenderingContext2D | null;
     set ctx(value: CanvasRenderingContext2D | null);
+    get defaultFontSize(): number;
+    get fontSize(): number;
+    set fontSize(value: number);
     getBoundingBox(): BoundingBox;
     hit(point: CoordinatePair): boolean;
     draw(): void;
