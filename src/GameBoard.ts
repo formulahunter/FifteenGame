@@ -257,6 +257,20 @@ class GameBoard {
         this.draw();
     }
 
+    shuffleTiles(): void {
+
+        let temp: number[] = [];
+        for(let i = 0; i < this.gridSize.x * this.gridSize.y; ++i) {
+            temp[i] = i;
+        }
+        for(let x = 0; x < this.tiles.length; ++x) {
+            for(let y = 0; y < this.tiles[x].length; ++y) {
+                let ind = Math.trunc(Math.random() * temp.length);
+                this.tiles[x][y] = temp.splice(ind, 1)[0];
+            }
+        }
+    }
+
     /** Draw the current state to the canvas */
     draw() {
 

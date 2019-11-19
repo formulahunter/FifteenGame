@@ -20,7 +20,7 @@ function main(): void {
     board.ctx = ctx;
 
     //  Shuffle the board and draw its initial state
-    //board.shuffle()
+    board.shuffleTiles();
     board.draw();
 
     //  Define the click event handler
@@ -37,15 +37,6 @@ function canvasClicked(ev: MouseEvent): void {
 }
 
 let board: GameBoard;
-
-/*function shuffleTiles(): void {
-    let temp: CoordinatePair[] = [];
-    for(let i = tiles.length - 1; i >= 0; --i) {
-        let ind = Math.trunc(Math.random() * tiles.length - 1);
-        temp.push(tiles.splice(ind, 1)[0]);
-    }
-    tiles = temp;
-}*/
 
 // const DIRECTION = ['up', 'right', 'down', 'left'];
 // function animateTile(tile, dir) {

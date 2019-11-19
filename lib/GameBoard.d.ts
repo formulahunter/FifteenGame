@@ -61,6 +61,7 @@ declare class GameBoard {
     getBoundingBox(): BoundingBox;
     hit(point: CoordinatePair): boolean;
     touch(point: CoordinatePair): void;
+    shuffleTiles(): void;
     /** Draw the current state to the canvas */
     draw(): void;
 }
