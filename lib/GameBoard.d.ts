@@ -2,6 +2,9 @@ interface CoordinatePair {
     x: number;
     y: number;
 }
+interface Tile extends CoordinatePair {
+    num: number;
+}
 declare class BoundedValue {
     readonly min: number;
     readonly max: number;
@@ -57,6 +60,7 @@ declare class GameBoard {
     set fontSize(value: number);
     getBoundingBox(): BoundingBox;
     hit(point: CoordinatePair): boolean;
+    touch(point: CoordinatePair): void;
     /** Draw the current state to the canvas */
     draw(): void;
 }

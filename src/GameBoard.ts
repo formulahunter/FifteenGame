@@ -2,6 +2,9 @@ interface CoordinatePair {
     x: number,
     y: number
 }
+interface Tile extends CoordinatePair {
+    num: number
+}
 
 class BoundedValue {
 
@@ -167,6 +170,91 @@ class GameBoard {
             point.y > bounds.y.min &&
             point.y < bounds.y.max
         );
+    }
+
+    touch(point: CoordinatePair) {
+
+        //  Identify which tile was touched
+        let col: number = Math.trunc((point.x - this.offset.x) / (this.tileSize + this.border));
+        let row: number = Math.trunc((point.y - this.offset.y) / (this.tileSize + this.border));
+        let tile: Readonly<Tile> = {
+            x: col,
+            y: row,
+            num: this.tiles?.[col]?.[row]
+        };
+        if(tile.num === undefined) {
+            throw new Error('The click event seems to be in bounds of the' +
+                ' game board, but there was an error identifying the clicked' +
+                ` tile at grid location {x: ${tile.x}, y: ${tile.y}}`);
+        }
+        if(tile.num === 0) {
+            //  The empty tile was clicked
+            //  Do nothing
+            console.debug('The empty tile was clicked\nnothing to do');
+            return;
+        }
+
+        //  Locate the empty cell
+        [col, row] = this.tiles.reduce((acc, val, ind) => {
+            let zeroInd: number = val.indexOf(0);
+            if(zeroInd >= 0) {
+                acc.push(ind, zeroInd);
+            }
+            return acc;
+        }, []);
+        if(col === -1 || row === -1) {
+            throw new Error('Error in GameBoard locating empty space');
+        }
+        let empty: Tile = {
+            x: col,
+            y: row,
+            num: 0
+        };
+
+        let displacement: CoordinatePair = {
+            x: tile.x - empty.x,
+            y: tile.y - empty.y
+        };
+        if(displacement.x !== 0 && displacement.y !== 0) {
+            //  Clicked tile is not in the same row OR column as the empty tile
+            //  Do nothing
+            console.debug(`Tile ${tile.num} is not aligned with the empty tile\nnothing to do`);
+            return;
+        }
+
+        //  Determine which axis and direction along that axis to move
+        let axis: 'x'|'y' = displacement.x === 0 ? 'y' : 'x';
+        let dir: number = Math.sign(displacement[axis]);
+        console.debug(displacement, axis, dir);
+
+        //  Start at the empty space's location in the grid and move each
+        //  tile one position toward the empty space, then set the original
+        //  tile's position to the new empty space
+        let shift: CoordinatePair = {
+            x: empty.x,
+            y: empty.y
+        };
+        let next: CoordinatePair = {
+            x: shift.x,
+            y: shift.y
+        };
+        if(dir > 0) {
+            for(let i = empty[axis]; i < tile[axis]; i += dir) {
+                shift[axis] = i;
+                next[axis] = i + dir;
+                this.tiles[shift.x][shift.y] = this.tiles[next.x][next.y];
+            }
+        }
+        else {
+            for(let i = empty[axis]; i > tile[axis]; i += dir) {
+                shift[axis] = i;
+                next[axis] = i + dir;
+                this.tiles[shift.x][shift.y] = this.tiles[next.x][next.y];
+            }
+        }
+        this.tiles[tile.x][tile.y] = 0;
+
+        this.draw();
     }
 
     /** Draw the current state to the canvas */
