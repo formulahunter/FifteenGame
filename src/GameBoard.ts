@@ -218,9 +218,13 @@ class GameBoard {
 
     touch(point: CoordinatePair) {
 
+        //  Adjust point for window scroll position and GameBoard position
+        point.x += window.scrollX - this.offset.x;
+        point.y += window.scrollY - this.offset.y;
+
         //  Identify which tile was touched
-        let col: number = Math.trunc((point.x - this.offset.x) / (this.tileSize + this.border));
-        let row: number = Math.trunc((point.y - this.offset.y) / (this.tileSize + this.border));
+        let col: number = Math.trunc(point.x / this.tileSize);
+        let row: number = Math.trunc(point.y / this.tileSize);
         const tile: Readonly<Tile> = {
             x: col,
             y: row,
@@ -368,7 +372,7 @@ class GameBoard {
         ctx.strokeRect(start.x, start.y, size.x, size.y);
 
         //  Draw tiles to te board
-        for (let i = 0; i < this.gridSize.x; ++i) {
+        for(let i = 0; i < this.gridSize.x; ++i) {
             for (let j = 0; j < this.gridSize.y; ++j) {
 
                 let tile: number = this.tiles[i][j];

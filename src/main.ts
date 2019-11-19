@@ -1,3 +1,5 @@
+let board: GameBoard;
+
 function main(): void {
 
     /** The canvas element */
@@ -35,8 +37,6 @@ function canvasClicked(ev: MouseEvent): void {
         board.touch(click);
     }
 }
-
-let board: GameBoard;
 
 // const DIRECTION = ['up', 'right', 'down', 'left'];
 // function animateTile(tile, dir) {

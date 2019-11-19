@@ -1,16 +1,16 @@
-//  Ignore WebStorm project directory
+# Ignore WebStorm project directory
 .idea/*
 
-//  Ignore user data files
+# Ignore user data files
 data/*
 
-//  Ignore server log directory
+# Ignore server log directory
 log/*
 
-//  Ignore Markdown files
+# Ignore Markdown files
 *.md
 
-//  Ignore images
+# Ignore images
 *.png
 *.gif
 *.svg
