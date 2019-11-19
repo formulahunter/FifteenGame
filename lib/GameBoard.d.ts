@@ -5,20 +5,20 @@ interface CoordinatePair {
 interface Tile extends CoordinatePair {
     num: number;
 }
-declare type Direction = {
-    x: 0;
-    y: -1;
-} | {
-    x: 1;
+/** A Direction indicates a unit vector along the x- OR y- axis, but never both
+ *  and never the zero-vector
+ */
+declare type Direction = DirectionX | DirectionY;
+/**  Unit vector along x-axis (can be positive or negative) */
+interface DirectionX extends CoordinatePair {
+    x: 1 | -1;
     y: 0;
-} | {
+}
+/**  Unit vector along y-axis (can be positive or negative) */
+interface DirectionY extends CoordinatePair {
     x: 0;
-    y: 1;
-} | {
-    x: -1;
-    y: 0;
-};
-declare type dir = ([0, 1 | -1]) | ([1 | -1, 0]);
+    y: 1 | -1;
+}
 declare class BoundedValue {
     readonly min: number;
     readonly max: number;

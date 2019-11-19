@@ -5,8 +5,21 @@ interface CoordinatePair {
 interface Tile extends CoordinatePair {
     num: number
 }
-type Direction = {x: 0, y: -1}|{x: 1, y: 0}|{x:0, y: 1}|{x: -1, y: 0};
-type dir = ([0, 1|-1])|([1|-1, 0]);
+
+/** A Direction indicates a unit vector along the x- OR y- axis, but never both
+ *  and never the zero-vector
+ */
+type Direction = DirectionX | DirectionY;
+/**  Unit vector along x-axis (can be positive or negative) */
+interface DirectionX extends CoordinatePair {
+    x: 1 | -1,
+    y: 0
+}
+/**  Unit vector along y-axis (can be positive or negative) */
+interface DirectionY extends CoordinatePair {
+    x: 0,
+    y: 1 | -1
+}
 
 class BoundedValue {
 
@@ -242,9 +255,9 @@ class GameBoard {
         }
 
         //  Separate the displacement from the direction on each axis
-        //  Remember that one of these will always be zero - calculations are
+        //  Remember that one of x or y will always be zero - calculations are
         //  applied to both so that it doesn't matter which one is which
-        let dir: CoordinatePair = {
+        let dir: Direction = <Direction>{
             x: Math.sign(displacement.x),
             y: Math.sign(displacement.y)
         };
@@ -266,7 +279,7 @@ class GameBoard {
                 x: shift.x + dir.x,
                 y: shift.y + dir.y
             };
-            this.moveTile(shift, <Direction>dir);
+            this.moveTile(shift, dir);
         }
         this.tiles[tile.x][tile.y] = 0;
 
