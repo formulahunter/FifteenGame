@@ -5,6 +5,20 @@ interface CoordinatePair {
 interface Tile extends CoordinatePair {
     num: number;
 }
+declare type Direction = {
+    x: 0;
+    y: -1;
+} | {
+    x: 1;
+    y: 0;
+} | {
+    x: 0;
+    y: 1;
+} | {
+    x: -1;
+    y: 0;
+};
+declare type dir = ([0, 1 | -1]) | ([1 | -1, 0]);
 declare class BoundedValue {
     readonly min: number;
     readonly max: number;
@@ -58,9 +72,11 @@ declare class GameBoard {
     get defaultFontSize(): number;
     get fontSize(): number;
     set fontSize(value: number);
+    get emptySpace(): Tile;
     getBoundingBox(): BoundingBox;
     hit(point: CoordinatePair): boolean;
     touch(point: CoordinatePair): void;
+    moveTile(tile: CoordinatePair, dir: Direction): CoordinatePair;
     shuffleTiles(): void;
     /** Draw the current state to the canvas */
     draw(): void;

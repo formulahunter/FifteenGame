@@ -5,6 +5,8 @@ interface CoordinatePair {
 interface Tile extends CoordinatePair {
     num: number
 }
+type Direction = {x: 0, y: -1}|{x: 1, y: 0}|{x:0, y: 1}|{x: -1, y: 0};
+type dir = ([0, 1|-1])|([1|-1, 0]);
 
 class BoundedValue {
 
@@ -154,6 +156,35 @@ class GameBoard {
     }
 
 
+    get emptySpace() {
+
+        //  Return the index of the column containing 0 and the index of 0
+        //  within that column
+        function findZero(acc: [number, number], val: number[], ind: number): [number, number] {
+            let zeroInd: number = val.indexOf(0);
+            if(zeroInd >= 0) {
+                acc.splice(0, 2, ind, zeroInd);
+            }
+            return acc;
+        }
+
+        //  Call reduce() with the initial value [-1, -1] so that the results
+        //  can be verified
+        let [col, row]: [number, number] = this.tiles.reduce(findZero, [-1, -1]);
+        if(col === -1 || row === -1) {
+            throw new Error('Error in GameBoard locating empty space');
+        }
+
+        //  Return the identified row/column
+        let empty: Tile = {
+            x: col,
+            y: row,
+            num: 0
+        };
+        return empty;
+    }
+
+
     getBoundingBox(): BoundingBox {
 
         return {
@@ -177,7 +208,7 @@ class GameBoard {
         //  Identify which tile was touched
         let col: number = Math.trunc((point.x - this.offset.x) / (this.tileSize + this.border));
         let row: number = Math.trunc((point.y - this.offset.y) / (this.tileSize + this.border));
-        let tile: Readonly<Tile> = {
+        const tile: Readonly<Tile> = {
             x: col,
             y: row,
             num: this.tiles?.[col]?.[row]
@@ -195,22 +226,10 @@ class GameBoard {
         }
 
         //  Locate the empty cell
-        [col, row] = this.tiles.reduce((acc, val, ind) => {
-            let zeroInd: number = val.indexOf(0);
-            if(zeroInd >= 0) {
-                acc.push(ind, zeroInd);
-            }
-            return acc;
-        }, []);
-        if(col === -1 || row === -1) {
-            throw new Error('Error in GameBoard locating empty space');
-        }
-        let empty: Tile = {
-            x: col,
-            y: row,
-            num: 0
-        };
+        let empty: Tile = this.emptySpace;
 
+        //  Determine the relative grid locations of the "touched" tile and the
+        //  empty space
         let displacement: CoordinatePair = {
             x: tile.x - empty.x,
             y: tile.y - empty.y
@@ -222,10 +241,17 @@ class GameBoard {
             return;
         }
 
-        //  Determine which axis and direction along that axis to move
-        let axis: 'x'|'y' = displacement.x === 0 ? 'y' : 'x';
-        let dir: number = Math.sign(displacement[axis]);
-        console.debug(displacement, axis, dir);
+        //  Separate the displacement from the direction on each axis
+        //  Remember that one of these will always be zero - calculations are
+        //  applied to both so that it doesn't matter which one is which
+        let dir: CoordinatePair = {
+            x: Math.sign(displacement.x),
+            y: Math.sign(displacement.y)
+        };
+        displacement = {
+            x: Math.abs(displacement.x),
+            y: Math.abs(displacement.y)
+        };
 
         //  Start at the empty space's location in the grid and move each
         //  tile one position toward the empty space, then set the original
@@ -234,27 +260,48 @@ class GameBoard {
             x: empty.x,
             y: empty.y
         };
-        let next: CoordinatePair = {
-            x: shift.x,
-            y: shift.y
-        };
-        if(dir > 0) {
-            for(let i = empty[axis]; i < tile[axis]; i += dir) {
-                shift[axis] = i;
-                next[axis] = i + dir;
-                this.tiles[shift.x][shift.y] = this.tiles[next.x][next.y];
-            }
-        }
-        else {
-            for(let i = empty[axis]; i > tile[axis]; i += dir) {
-                shift[axis] = i;
-                next[axis] = i + dir;
-                this.tiles[shift.x][shift.y] = this.tiles[next.x][next.y];
-            }
+        let numMoves: number = displacement.x === 0 ? displacement.y : displacement.x;
+        for(let i = 0; i < numMoves; ++i) {
+            shift = {
+                x: shift.x + dir.x,
+                y: shift.y + dir.y
+            };
+            this.moveTile(shift, <Direction>dir);
         }
         this.tiles[tile.x][tile.y] = 0;
 
         this.draw();
+    }
+
+    moveTile(tile: CoordinatePair, dir: Direction): CoordinatePair {
+
+        //  Determine the tentative new coordinates and verify they point to the
+        //  empty space
+        //  Use subtraction to increment the coordinate because dir measures
+        //  displacement *from empty to tile* but shift direction is *from tile
+        //  tile to empty*
+        let [x, y]: [number, number] = [tile.x - dir.x, tile.y - dir.y];
+        console.debug(`Moving {${tile.x}, ${tile.y}} to {${x}, ${y}}`);
+        let newCoords: Tile = {
+            x: x,
+            y: y,
+            num: this.tiles[tile.x][tile.y]
+        };
+        if(this.tiles[newCoords.x][newCoords.y] !== 0) {
+            throw new Error(`Cannot move tile at ${tile} to non-empty space
+                                ${newCoords}`);
+        }
+
+        //  Update this.tiles to reflect the new tile and empty space positions
+        this.tiles[newCoords.x][newCoords.y] = newCoords.num;
+        this.tiles[tile.x][tile.y] = 0;
+
+        //  Count and/or stack (for 'undo') the move
+
+        //  Also check the "win" condition
+
+        //  Return the new tile position/number
+        return newCoords;
     }
 
     shuffleTiles(): void {
