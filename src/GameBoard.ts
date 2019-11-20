@@ -69,6 +69,14 @@ class GameBoard {
      */
     private readonly tiles: number[][];
 
+    /** Record all moves made during a game for undo/history */
+    private _history: Direction[] = [];
+
+    private historyInd: number = 0;
+
+    /** Count all moves (including undo/redo) */
+    private _moveCount: number = 0;
+
     /** The offset of the upper-left corner of the first tile from the
      *  upper-left corner of the canvas element
      */
@@ -182,6 +190,11 @@ class GameBoard {
             throw new Error(`Cannot set GameBoard's font size to a negative value: ${value}`);
 
         this._fontSize = value;
+    }
+
+
+    get history(): Direction[] {
+        return this._history;
     }
 
 
@@ -330,6 +343,14 @@ class GameBoard {
         this.tiles[tile.x][tile.y] = 0;
 
         //  Count and/or stack (for 'undo') the move
+        if(this.historyInd === this.history.length - 1) {
+            this.historyInd = this.history.push(dir) - 1;
+        }
+        else {
+            this.history.splice(this.historyInd);
+            this.historyInd = this.history.push(dir) - 1;
+        }
+        ++this._moveCount;
 
         //  Also check the "win" condition
 
@@ -428,5 +449,13 @@ class GameBoard {
                     tileOffset.y + (this.tileSize / 2));
             }
         }
+
+        //  Paint the move count to the left of the board
+        let padding: number = this.border + this.margin + 10;
+        ctx.clearRect(this.offset.x - padding, this.offset.y, -100, this.size.y);
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#000000';
+        ctx.fillText(this._moveCount.toString(), this.offset.x -  padding, this.offset.y);
     }
 }
