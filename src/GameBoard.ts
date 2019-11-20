@@ -83,6 +83,8 @@ class GameBoard {
      *  margin is cleared when the board is drawn
      */
     private _margin: number = 2;
+    /** Compute size once during construction */
+    private size: CoordinatePair;
 
     /** The canvas drawing context */
     private _ctx: CanvasRenderingContext2D | null = null;
@@ -90,6 +92,12 @@ class GameBoard {
     private _fontSize: number;
 
     constructor() {
+
+        //  Define the size property
+        this.size = {
+            x: this.gridSize.x * this.tileSize,
+            y: this.gridSize.y * this.tileSize
+        };
 
         this.tiles = [];
         for (let i = 0; i < this.gridSize.x; ++i) {
@@ -126,6 +134,10 @@ class GameBoard {
     }
     set tileSize(value: number) {
         this._tileSize = value;
+        this.size = {
+            x: this.gridSize.x * this.tileSize,
+            y: this.gridSize.y * this.tileSize
+        };
         console.debug('GameBoard tile size has been changed - consider' +
             ' updating font size using setFontSize()');
     }
@@ -135,6 +147,10 @@ class GameBoard {
     }
     set gridSize(value: CoordinatePair) {
         this._gridSize = value;
+        this.size = {
+            x: this.gridSize.x * this.tileSize,
+            y: this.gridSize.y * this.tileSize
+        };
     }
 
     get offset(): CoordinatePair {
