@@ -1,6 +1,9 @@
 # Ignore WebStorm project directory
 .idea/*
 
+# Ignore TypeScript build directory
+lib/*
+
 # Ignore user data files
 data/*
 
