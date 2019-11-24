@@ -80,9 +80,9 @@ class GameBoard {
     /** The offset of the upper-left corner of the first tile from the
      *  upper-left corner of the canvas element
      */
-    private _offset: CoordinatePair = {x: 250, y: 100};
+    private _offset: CoordinatePair;
     /** The number of tiles along one axis of the board */
-    private _gridSize: CoordinatePair = {x: 4, y: 4};
+    private _gridSize: CoordinatePair;
     /** The length of one side of a square tile, in pixels */
     private _tileSize: number = 100;
     /** The width of the board's border, in pixels */
@@ -92,20 +92,19 @@ class GameBoard {
      */
     private _margin: number = 2;
     /** Compute size once during construction */
-    private size: CoordinatePair;
+    private _size: CoordinatePair;
 
-    /** The canvas drawing context */
-    private _ctx: CanvasRenderingContext2D | null = null;
     /** Font size of number characters on the board, in pixels */
-    private _fontSize: number;
+    private _fontSize: number = -1;
 
-    constructor() {
+    constructor(gridSize: CoordinatePair, size: CoordinatePair, offset: CoordinatePair) {
 
-        //  Define the size property
-        this.size = {
-            x: this.gridSize.x * this.tileSize,
-            y: this.gridSize.y * this.tileSize
-        };
+        this._gridSize = gridSize;
+        this._size = size;
+        this._offset = offset;
+
+        //  Define the tileSize property
+        this.tileSize = Math.round(this.size.x / this.gridSize.x);
 
         this.tiles = [];
         for (let i = 0; i < this.gridSize.x; ++i) {
@@ -117,11 +116,15 @@ class GameBoard {
 
         //  0 is the empty space
         this.tiles[this.gridSize.x - 1][this.gridSize.y - 1] = 0;
-
-        //  Set the default font size
-        this._fontSize = this.defaultFontSize;
     }
 
+
+    get size(): CoordinatePair {
+        return this._size;
+    }
+    set size(value: CoordinatePair) {
+        this._size = value;
+    }
 
     get margin(): number {
         return this._margin;
@@ -142,12 +145,14 @@ class GameBoard {
     }
     set tileSize(value: number) {
         this._tileSize = value;
-        this.size = {
+        this._size = {
             x: this.gridSize.x * this.tileSize,
             y: this.gridSize.y * this.tileSize
         };
-        console.debug('GameBoard tile size has been changed - consider' +
-            ' updating font size using setFontSize()');
+        if(this._fontSize !== -1) {
+            console.debug('GameBoard tile size has been changed - consider' +
+                ' updating font size using setFontSize()');
+        }
     }
 
     get gridSize(): CoordinatePair {
@@ -155,7 +160,7 @@ class GameBoard {
     }
     set gridSize(value: CoordinatePair) {
         this._gridSize = value;
-        this.size = {
+        this._size = {
             x: this.gridSize.x * this.tileSize,
             y: this.gridSize.y * this.tileSize
         };
@@ -169,25 +174,20 @@ class GameBoard {
     }
 
 
-    get ctx(): CanvasRenderingContext2D | null {
-        return this._ctx;
-    }
-    set ctx(value: CanvasRenderingContext2D | null) {
-        this._ctx = value;
-    }
-
     get defaultFontSize() {
         return this.tileSize * 0.6;
     }
     get fontSize(): number {
+        if(this._fontSize === -1) {
+            return this.defaultFontSize;
+        }
+
         return this._fontSize;
     }
     set fontSize(value: number) {
         //  Setting the font size to -1 sets the font size to 60% of tile size
-        if(value < -1)
-            value = this.tileSize * 0.6;
-        else if(value < 0)
-            throw new Error(`Cannot set GameBoard's font size to a negative value: ${value}`);
+        if(value < 0 && value !== -1)
+            throw new Error(`Cannot set GameBoard's font size to negative value: ${value}`);
 
         this._fontSize = value;
     }
@@ -315,8 +315,6 @@ class GameBoard {
             this.moveTile(shift, dir);
         }
         this.tiles[tile.x][tile.y] = 0;
-
-        this.draw();
     }
 
     moveTile(tile: CoordinatePair, dir: Direction): CoordinatePair {
@@ -373,14 +371,7 @@ class GameBoard {
     }
 
     /** Draw the current state to the canvas */
-    draw() {
-
-        //  Get local drawing context reference and verify it has been assigned
-        let ctx = this.ctx;
-        if(ctx === null) {
-            throw new Error('Cannot draw GameBoard: canvas rendering context' +
-                ' has not been assigned');
-        }
+    draw(ctx: CanvasRenderingContext2D) {
 
         //  Clear the board area
         let start: CoordinatePair = {
@@ -453,6 +444,7 @@ class GameBoard {
         //  Paint the move count to the left of the board
         let padding: number = this.border + this.margin + 10;
         ctx.clearRect(this.offset.x - padding, this.offset.y, -100, this.size.y);
+        ctx.font = `${this.fontSize}px sans-serif`;
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#000000';
