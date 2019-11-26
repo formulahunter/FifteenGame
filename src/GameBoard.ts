@@ -198,7 +198,7 @@ class GameBoard {
     }
 
 
-    get emptySpace() {
+    get emptySpace(): Tile {
 
         //  Return the index of the column containing 0 and the index of 0
         //  within that column
@@ -354,6 +354,35 @@ class GameBoard {
 
         //  Return the new tile position/number
         return newCoords;
+    }
+
+    undo() {
+        if(this.historyInd === 0) {
+            console.debug('No previous moves to undo');
+            return;
+        }
+        let move: Direction = this.history[this.historyInd];
+
+        //  move pointed from empty -> tile *before* the tile was moved
+        //  now points from tile -> empty
+        //  get the current position of the empty tile
+        //  subtract move from empty to get position of last moved tile
+        let empty: Tile = this.emptySpace;
+        let lastTile: Tile = {
+            x: empty.x - move.x,
+            y: empty.y - move.y,
+            num: this.tiles[empty.x - move.x][empty.y - move.y]
+        };
+
+        //  Swap the empty and last moved tiles
+        this.tiles[empty.x][empty.y] = lastTile.num;
+        this.tiles[lastTile.x][lastTile.y] = 0;
+
+        //  update history index
+        --this.historyInd;
+
+        //  increment move count
+        ++this._moveCount;
     }
 
     shuffleTiles(): void {

@@ -66,6 +66,10 @@ function canvasClicked(ev: MouseEvent): void {
         board.touch(click);
         board.draw(ctx);
     }
+    if(undoButton.hit(click)) {
+        board.undo();
+        board.draw(ctx);
+    }
 }
 
 // const DIRECTION = ['up', 'right', 'down', 'left'];
