@@ -36,6 +36,7 @@ function main(): void {
     };
     board = new GameBoard(boardGrid, boardSize, boardOffset);
 
+    //  Create the 'undo' button
     let undoOffset: CoordinatePair = {
         x: boardOffset.x,
         y: boardOffset.y + boardSize.y + board.margin + 10
