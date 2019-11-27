@@ -72,6 +72,7 @@ class GameBoard {
     /** Record all moves made during a game for undo/history */
     private _history: Direction[] = [];
 
+    /* History index is always one position *ahead* of last *applied* move */
     private historyInd: number = 0;
 
     /** Count all moves (including undo/redo) */
@@ -341,13 +342,13 @@ class GameBoard {
         this.tiles[tile.x][tile.y] = 0;
 
         //  Count and/or stack (for 'undo') the move
-        if(this.historyInd === this.history.length - 1) {
-            this.historyInd = this.history.push(dir) - 1;
+        if(this.historyInd === this.history.length) {
+            this.history.push(dir);
         }
         else {
-            this.history.splice(this.historyInd);
-            this.historyInd = this.history.push(dir) - 1;
+            this.history.splice(this.historyInd, this.history.length - this.historyInd, dir);
         }
+        ++this.historyInd;
         ++this._moveCount;
 
         //  Also check the "win" condition
@@ -359,9 +360,12 @@ class GameBoard {
     undo() {
         if(this.historyInd === 0) {
             console.debug('No previous moves to undo');
+            // console.debug(`historyInd: ${this.historyInd}\nhistory.length: ${this.history.length}`);
             return;
         }
-        let move: Direction = this.history[this.historyInd];
+
+        //  get the previous move
+        let move: Direction = this.history[this.historyInd - 1];
 
         //  move pointed from empty -> tile *before* the tile was moved
         //  now points from tile -> empty
@@ -389,6 +393,8 @@ class GameBoard {
             console.debug('No subsequent moves to redo');
             return;
         }
+
+        //  get the next move
         let move: Direction = this.history[this.historyInd];
 
         //  'redo' affects a move in the same direction as the original move
@@ -505,6 +511,6 @@ class GameBoard {
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#000000';
-        ctx.fillText(this._moveCount.toString(), this.offset.x -  padding, this.offset.y);
+        ctx.fillText(this._moveCount.toString(), this.offset.x - padding, this.offset.y);
     }
 }
