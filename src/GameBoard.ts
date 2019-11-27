@@ -475,7 +475,7 @@ class GameBoard {
         ctx.strokeStyle = 'black';
         ctx.strokeRect(start.x, start.y, size.x, size.y);
 
-        //  Draw tiles to te board
+        //  Draw tiles to the board
         for(let i = 0; i < this.gridSize.x; ++i) {
             for (let j = 0; j < this.gridSize.y; ++j) {
 
@@ -525,5 +525,41 @@ class GameBoard {
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#000000';
         ctx.fillText(this._moveCount.toString(), this.offset.x - padding, this.offset.y);
+
+        //  Draw move history
+        let moveDrawCount: number = 16;
+        let shade = 0;
+        let netShade = 50;
+        let pos: CoordinatePair = this.emptySpace;
+        let next: CoordinatePair;
+        ctx.translate(this.offset.x + this.tileSize / 2, this.offset.y + this.tileSize / 2);
+        for(let i = 0; i < moveDrawCount; ++i) {
+            let ind: number = this.historyInd - 1 - i;
+            if(ind < 0) {
+                break;
+            }
+
+            let move = this.history[ind];
+            next = {
+                x: pos.x - move.x,
+                y: pos.y - move.y
+            };
+
+            //  draw the current move (pos <--> next)
+            ctx.beginPath();
+            ctx.moveTo(this.tileSize * pos.x, this.tileSize * pos.y);
+            ctx.lineTo(this.tileSize * next.x, this.tileSize * next.y);
+
+            ctx.strokeStyle = `hsla(0, 0%, ${shade}%, 0.5)`;
+            ctx.lineWidth = 5;
+            ctx.stroke();
+
+            //  increment shade
+            shade += netShade / moveDrawCount;
+
+            //  set pos to the position calculated in 'next'
+            pos = next;
+        }
+        ctx.resetTransform();
     }
 }
