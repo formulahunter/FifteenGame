@@ -384,6 +384,34 @@ class GameBoard {
         //  increment move count
         ++this._moveCount;
     }
+    redo() {
+        if(this.history.length === 0 || this.historyInd === this.history.length) {
+            console.debug('No subsequent moves to redo');
+            return;
+        }
+        let move: Direction = this.history[this.historyInd];
+
+        //  'redo' affects a move in the same direction as the original move
+        //  (unlike undo)
+        //  get the current position of the empty tile
+        //  add move to empty to get position of the next moved tile
+        let empty: Tile = this.emptySpace;
+        let nextTile: Tile = {
+            x: empty.x + move.x,
+            y: empty.y + move.y,
+            num: this.tiles[empty.x + move.x][empty.y + move.y]
+        };
+
+        //  swap the empty and next moved tiles
+        this.tiles[empty.x][empty.y] = nextTile.num;
+        this.tiles[nextTile.x][nextTile.y] = 0;
+
+        //  update history index
+        ++this.historyInd;
+
+        //  increment move count
+        ++this._moveCount;
+    }
 
     shuffleTiles(): void {
 
