@@ -351,10 +351,23 @@ class GameBoard {
         ++this.historyInd;
         ++this._moveCount;
 
-        //  Also check the "win" condition
-
         //  Return the new tile position/number
         return newCoords;
+    }
+    checkWin(): boolean {
+
+        if(this.tiles[this.gridSize.x - 1][this.gridSize.y - 1] !== 0) {
+            return false;
+        }
+
+        let numTiles = this.gridSize.x * this.gridSize.y - 1;
+        for(let i = numTiles - 1; i >= 0; --i) {
+            if(this.tiles[i % 4][Math.trunc(i / 4)] !== i + 1) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     undo() {

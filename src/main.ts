@@ -71,12 +71,23 @@ function main(): void {
 }
 document.addEventListener('DOMContentLoaded', main);
 
+function printWin(ctx: CanvasRenderingContext2D) {
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = 'black';
+    ctx.fillText('YOU WIN!', board.offset.x + board.size.x + 50, board.offset.y);
+}
+
 function canvasClicked(ev: MouseEvent): void {
 
     let click: CoordinatePair = {x: ev.clientX, y: ev.clientY};
     if(board.hit(click)) {
         board.touch(click);
         board.draw(ctx);
+        if(board.checkWin() === true) {
+            printWin(ctx);
+        }
     }
     if(undoButton.hit(click)) {
         board.undo();
